@@ -1,0 +1,58 @@
+{
+  "family": "agenticos-api",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "3072",
+  "executionRoleArn": "arn:aws:iam::<ACCOUNT_ID>:role/agenticos-ecs-execution-role",
+  "taskRoleArn": "arn:aws:iam::<ACCOUNT_ID>:role/agenticos-ecs-task-role",
+  "containerDefinitions": [
+    {
+      "name": "agenticos-api",
+      "image": "<ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/agenticos:latest",
+      "essential": true,
+      "portMappings": [{ "containerPort": 8000, "protocol": "tcp" }],
+      "environment": [
+        { "name": "AGENTICOS_DB_PATH", "value": "/mnt/agenticos-data/agenticos.db" },
+        { "name": "AGENTICOS_VECTOR_DB_DIR", "value": "/mnt/agenticos-data/vector_db" },
+        { "name": "AGENTICOS_DOCS_DIR", "value": "/app/docs" },
+        { "name": "AGENTICOS_LOG_JSON", "value": "true" },
+        { "name": "AGENTICOS_LOG_LEVEL", "value": "INFO" }
+      ],
+      "secrets": [
+        { "name": "AGENTICOS_OLLAMA_BASE_URL", "valueFrom": "arn:aws:ssm:<REGION>:<ACCOUNT_ID>:parameter/agenticos/ollama_base_url" }
+      ],
+      "mountPoints": [
+        { "sourceVolume": "agenticos-data", "containerPath": "/mnt/agenticos-data" }
+      ],
+      "healthCheck": {
+        "command": ["CMD-SHELL", "python -c \"import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health', timeout=3).status == 200 else 1)\""],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 30
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/agenticos-api",
+          "awslogs-region": "<REGION>",
+          "awslogs-stream-prefix": "api"
+        }
+      }
+    }
+  ],
+  "volumes": [
+    {
+      "name": "agenticos-data",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "<EFS_FILE_SYSTEM_ID>",
+        "transitEncryption": "ENABLED",
+        "authorizationConfig": {
+          "accessPointId": "<EFS_ACCESS_POINT_ID>",
+          "iam": "ENABLED"
+        }
+      }
+    }
+  ]
+}

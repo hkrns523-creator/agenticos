@@ -1,0 +1,26 @@
+--index-url https://download.pytorch.org/whl/cpu
+--extra-index-url https://pypi.org/simple
+# Orchestration & LLM
+langchain-core~=1.4
+langchain-ollama~=1.1
+langgraph~=1.2
+
+# Config & validation
+pydantic~=2.9
+pydantic-settings~=2.6
+
+# UI
+streamlit~=1.59
+python-dotenv~=1.2
+
+# Vector database & RAG
+langchain-community
+langchain-huggingface
+langchain-text-splitters
+chromadb
+sentence-transformers
+pypdf
+
+# Deployment (containerized HTTP API for Docker/AWS)
+fastapi~=0.118
+uvicorn[standard]~=0.34

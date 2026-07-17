@@ -1,0 +1,44 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      AGENTICOS_OLLAMA_BASE_URL: "http://host.docker.internal:11434"
+      AGENTICOS_DB_PATH: "/app/data/agenticos.db"
+      AGENTICOS_DOCS_DIR: "/app/docs"
+      AGENTICOS_VECTOR_DB_DIR: "/app/vector_db"
+      AGENTICOS_LOG_JSON: "true"
+    volumes:
+      - agenticos_data:/app/data
+      - agenticos_vector_db:/app/vector_db
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health', timeout=3).status == 200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["streamlit", "run", "src/agenticos/ui/streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+    ports:
+      - "8501:8501"
+    environment:
+      AGENTICOS_OLLAMA_BASE_URL: "http://host.docker.internal:11434"
+      AGENTICOS_DB_PATH: "/app/data/agenticos.db"
+      AGENTICOS_DOCS_DIR: "/app/docs"
+      AGENTICOS_VECTOR_DB_DIR: "/app/vector_db"
+    volumes:
+      - agenticos_data:/app/data
+      - agenticos_vector_db:/app/vector_db
+    restart: unless-stopped
+
+volumes:
+  agenticos_data:
+  agenticos_vector_db:
