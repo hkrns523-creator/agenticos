@@ -120,7 +120,7 @@ def safe_structured_invoke(
 
     Returns (parsed, raw_message, error).
     """
-    structured_model = model.with_structured_output(schema, include_raw=True)
+    structured_model = model.with_structured_output(schema, include_raw=True, method="function_calling")
     result, err = safe_invoke(structured_model, messages, settings)
     if err:
         return None, None, err
