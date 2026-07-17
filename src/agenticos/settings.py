@@ -48,6 +48,7 @@ class Settings(BaseSettings):
     vector_db_dir: Path = Field(default=PROJECT_ROOT / "vector_db")
     embedding_model: str = Field(default="sentence-transformers/all-MiniLM-L6-v2")
     rag_top_k: int = Field(default=3, ge=1, le=20)
+    rag_enabled: bool = Field(default=True, description="Whether the documentation_agent (RAG) is registered and available to the planner.")
 
     # --- RAG retrieval tuning ----------------------------------------------
     # Raw PDF pages are frequently too coarse a retrieval unit (a manual page
