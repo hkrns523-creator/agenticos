@@ -28,8 +28,14 @@ class Settings(BaseSettings):
     )
 
     # --- LLM backend -----------------------------------------------------
+    # "ollama" = local/self-hosted model (default, used for local dev/demo).
+    # "groq" = hosted OpenAI-compatible endpoint, used for public deployment
+    # where nothing is available to run Ollama continuously.
+    llm_backend: Literal["ollama", "groq"] = Field(default="ollama")
     ollama_model: str = Field(default="qwen2.5:3b-instruct")
     ollama_base_url: str = Field(default="http://localhost:11434")
+    groq_model: str = Field(default="llama-3.1-8b-instant")
+    groq_api_key: str | None = Field(default=None)
     llm_temperature: float = Field(default=0.0, ge=0.0, le=2.0)
     llm_request_timeout: float = Field(default=30.0, gt=0)
     llm_max_retries: int = Field(default=2, ge=0, le=5)

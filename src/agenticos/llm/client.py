@@ -34,13 +34,32 @@ T = TypeVar("T", bound=BaseModel)
 def build_chat_model(settings: Settings | None = None) -> BaseChatModel:
     """Builds the chat model used for planning and summarization.
 
-    Import is local so environments that only need the graph's data-fetch
-    path (e.g. some unit tests) aren't forced to have langchain-ollama
-    installed.
+    Backend is selected by `settings.llm_backend`:
+      - "ollama" (default): local/self-hosted model, used for local dev/demo.
+      - "groq": hosted OpenAI-compatible endpoint, used for public deployments
+        where nothing is available to run Ollama continuously.
+
+    Imports are local so environments that only need the graph's data-fetch
+    path (e.g. some unit tests) aren't forced to have every LLM client
+    library installed.
     """
+    settings = settings or get_settings()
+
+    if settings.llm_backend == "groq":
+        from langchain_openai import ChatOpenAI
+
+        if not settings.groq_api_key:
+            raise ValueError("AGENTICOS_GROQ_API_KEY must be set when llm_backend=groq")
+        return ChatOpenAI(
+            model=settings.groq_model,
+            api_key=settings.groq_api_key,
+            base_url="https://api.groq.com/openai/v1",
+            temperature=settings.llm_temperature,
+            timeout=settings.llm_request_timeout,
+        )
+
     from langchain_ollama import ChatOllama
 
-    settings = settings or get_settings()
     return ChatOllama(
         model=settings.ollama_model,
         base_url=settings.ollama_base_url,
