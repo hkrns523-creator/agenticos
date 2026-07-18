@@ -32,11 +32,13 @@ class PlannerDecision(BaseModel):
     pick agents, then a second call per agent to decide how to call its
     tool) is what collapses the graph from ~10 possible LLM calls to 2."""
 
+    reason: str = Field(
+        description="Step-by-step: which agents are relevant to the request and why, decided before the final assignment list."
+    )
     assignments: list[AgentAssignment] = Field(
         default_factory=list,
         description="The specialist agents to run for this request, each with the parameters it needs.",
     )
-    reason: str = Field(description="A brief explanation of why these agents (or none) were chosen.")
 
 
 class TokenUsage(TypedDict):
