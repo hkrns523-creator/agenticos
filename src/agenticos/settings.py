@@ -27,7 +27,8 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # --- LLM backend -----------------------------------------------------
+    # LLM backend 
+    -----------------------------------------------------
     # "ollama" = local/self-hosted model (default, used for local dev/demo).
     # "groq" = hosted OpenAI-compatible endpoint, used for public deployment
     # where nothing is available to run Ollama continuously.
@@ -42,7 +43,7 @@ class Settings(BaseSettings):
     llm_retry_min_wait: float = Field(default=0.5, ge=0)
     llm_retry_max_wait: float = Field(default=4.0, ge=0)
 
-    # --- Data layer --------------------------------------------------------
+    # Data layer --------------------------------------------------------
     db_path: Path = Field(default=PROJECT_ROOT / "data" / "agenticos.db")
     docs_dir: Path = Field(default=PROJECT_ROOT / "docs")
     vector_db_dir: Path = Field(default=PROJECT_ROOT / "vector_db")
@@ -50,7 +51,7 @@ class Settings(BaseSettings):
     rag_top_k: int = Field(default=3, ge=1, le=20)
     rag_enabled: bool = Field(default=True, description="Whether the documentation_agent (RAG) is registered and available to the planner.")
 
-    # --- RAG retrieval tuning ----------------------------------------------
+    #  RAG retrieval tuning ----------------------------------------------
     # Raw PDF pages are frequently too coarse a retrieval unit (a manual page
     # can cover several unrelated procedures); chunking gives the retriever
     # smaller, more topically-focused units to match against.
